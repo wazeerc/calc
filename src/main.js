@@ -20,7 +20,7 @@ app.innerHTML = `
 <main class="app-main">
   <section class="panel" role="tabpanel" id="panel-land" aria-labelledby="tab-land">
   <h2 class="panel-title">Convert land measurements</h2>
-  <p class="hint">Type a value in any field. Other units update automatically.</p>
+  <p class="hint">Enter a value in any field.</p>
   <ul class="fields" id="fields"></ul>
   <section class="guide" aria-label="Land reference">
     <h2 class="guide-title">Reference</h2>
@@ -37,10 +37,9 @@ app.innerHTML = `
     </table>
     <h2 class="guide-title">Learn More</h2>
     <ul class="guide-blurbs">
-      <li><strong>Square Meters (m&sup2;):</strong> The global standard for area. Recognized in Mauritius.</li>
-      <li><strong>Perche:</strong> The traditional Mauritian plot unit. 1 perch is about 42.21 m&sup2;, standard for residential land.</li>
-      <li><strong>Toise:</strong> An older unit from French records. 1 toise is about 3.80 m&sup2;; still seen in legacy deeds.</li>
-      <li><strong>Arpent:</strong> The large Mauritian unit. 1 arpent is 100 perches, about 4,220.87 m&sup2;.</li>
+      <li><strong>Square Meters (m&sup2;):</strong> The global standard for area.</li>
+      <li><strong>Perche:</strong> The traditional Mauritian plot unit, standard for residential land.</li>
+      <li><strong>Toise:</strong> An older unit from French records, still seen in legacy deeds.</li>
     </ul>
   </section>
   </section>
@@ -192,7 +191,7 @@ recalculate('perche', false)
 const bmiPanel = document.querySelector('#panel-bmi')
 bmiPanel.innerHTML = `
   <h2 class="panel-title">Check your BMI (adults 18+)</h2>
-  <p class="hint">Enter age, weight, and height. BMI updates automatically. Metric only.</p>
+  <p class="hint">Enter age, weight, and height.</p>
   <ul class="fields bmi-fields" id="bmi-fields"></ul>
   <p class="bmi-result" id="bmi-result"></p>
   <ul class="bmi-bar" id="bmi-bar" aria-hidden="true"></ul>
@@ -200,7 +199,7 @@ bmiPanel.innerHTML = `
   <p class="bmi-refused" id="bmi-refused" hidden></p>
   <section class="guide" aria-label="BMI reference">
     <h2 class="guide-title">Reference</h2>
-    <p class="guide-intro">BMI is weight in kilograms divided by height in meters squared. The bands below are the adult (20+) scale.</p>
+    <p class="guide-intro">Body Mass Index (BMI) is a measure of body fat based on height and weight. The bands below are the adult (20+) scale.</p>
     <table class="guide-table">
       <thead>
         <tr><th scope="col">BMI</th><th scope="col">Category</th></tr>
