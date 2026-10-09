@@ -103,6 +103,7 @@ body {
   background: var(--red);
   border-color: var(--red);
   border-width: 1px;
+  padding: 9px 15px;
   color: #ffffff;
 }
 

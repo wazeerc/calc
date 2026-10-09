@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && pnpm budget",
+    "budget": "cap=${BUDGET_BYTES:-12288}; total=$(for f in dist/assets/*.js dist/assets/*.css; do gzip -c \"$f\" | wc -c; done | awk '{s+=$1} END {print s}'); echo \"JS+CSS gzip: $total bytes (cap $cap)\"; [ \"$total\" -le \"$cap\" ]",
     "preview": "vite preview"
   },
   "devDependencies": {
