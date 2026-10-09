@@ -56,6 +56,142 @@ body {
   letter-spacing: 1px;
 }
 
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tab {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  min-height: 44px;
+  padding: 8px 22px;
+  color: var(--paper);
+  background: transparent;
+  border: 2px solid var(--paper);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.tab:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: #ffffff;
+}
+
+.tab[aria-selected='true'] {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: var(--ink);
+}
+
+.tab:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 2px;
+}
+
+.tab[aria-selected='true']:focus-visible {
+  outline-color: var(--paper);
+}
+
+.bmi-result {
+  margin: 0 0 14px;
+  min-height: 29px;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.bmi-result:empty::before {
+  content: 'Your result will appear here.';
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.bmi-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  border: 2px solid var(--ink);
+}
+
+.bmi-block {
+  margin: 0;
+  padding: 8px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  border-right: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  background: var(--card);
+}
+
+.bmi-block:nth-child(4n) {
+  border-right: 0;
+}
+
+.bmi-block:nth-last-child(-n + 4) {
+  border-bottom: 0;
+}
+
+.bmi-block.is-active {
+  background: var(--yellow);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.bmi-note,
+.bmi-refused {
+  margin: 0 0 14px;
+  padding-left: 12px;
+  border-left: 8px solid var(--yellow);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.bmi-refused {
+  border-left-color: var(--ink);
+}
+
+.bmi-note[hidden],
+.bmi-refused[hidden] {
+  display: none;
+}
+
+.fields.bmi-fields {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.fields.bmi-fields .field {
+  border-bottom: 0;
+  border-right: 0;
+  padding: 8px;
+}
+
+.fields.bmi-fields .field + .field {
+  border-left: 2px solid var(--ink);
+}
+
+.fields.bmi-fields .field-label {
+  font-size: 10px;
+  letter-spacing: 0.6px;
+}
+
+.fields.bmi-fields .field-input {
+  min-height: 44px;
+  padding: 6px 8px;
+  font-size: 17px;
+}
+
 .app-main {
   flex: 1 1 auto;
   min-height: 0;
@@ -217,6 +353,14 @@ body {
   letter-spacing: 0.8px;
 }
 
+.guide-intro {
+  margin: 0;
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -280,6 +424,19 @@ body {
 
   .field:nth-child(odd) {
     border-right: 2px solid var(--ink);
+  }
+
+  .bmi-bar {
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  .bmi-block {
+    border-bottom: 0;
+    border-right: 2px solid var(--ink);
+  }
+
+  .bmi-block:last-child {
+    border-right: 0;
   }
 
   .app-main {
