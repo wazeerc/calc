@@ -3,20 +3,23 @@ import { UNITS, convert, parseInput, formatPlain } from './converter.js'
 import { BANDS, calculate, formatBmi, parseAge, parseWeightKg, parseHeightCm } from './bmi.js'
 
 const DEBOUNCE_MS = 200
-const GITHUB_URL = 'https://github.com/wazeerc/calc'
+const GITHUB_URL = 'https://github.com/wazeerc'
 
 const app = document.querySelector('#app')
 
 app.innerHTML = `
 <header class="app-header">
-  <h1>CALC</h1>
-  <div class="tabs" role="tablist" aria-label="Calculators">
-    <button class="tab" role="tab" id="tab-land" aria-controls="panel-land" aria-selected="true" tabindex="0">LAND</button>
-    <button class="tab" role="tab" id="tab-bmi" aria-controls="panel-bmi" aria-selected="false" tabindex="-1">BMI</button>
+  <div class="header-row">
+    <div class="brand"><h1>CALC</h1><span class="tagline"><span aria-hidden="true">— </span>just a helpful calculator</span></div>
+    <div class="tabs" role="tablist" aria-label="Calculators">
+      <button class="tab" role="tab" id="tab-land" aria-controls="panel-land" aria-selected="true" tabindex="0">LAND</button>
+      <button class="tab" role="tab" id="tab-bmi" aria-controls="panel-bmi" aria-selected="false" tabindex="-1">BMI</button>
+    </div>
   </div>
 </header>
 <main class="app-main">
   <section class="panel" role="tabpanel" id="panel-land" aria-labelledby="tab-land">
+  <h2 class="panel-title">Convert land measurements</h2>
   <p class="hint">Type a value in any field. Other units update automatically.</p>
   <ul class="fields" id="fields"></ul>
   <section class="guide" aria-label="Land reference">
@@ -46,7 +49,8 @@ app.innerHTML = `
   <p class="sr-only" aria-live="polite" id="live"></p>
 </main>
 <footer class="app-footer">
-  <span>&copy; <span id="year"></span> <a href="${GITHUB_URL}" target="_blank" rel="noopener">wazeerc</a></span>
+  <span class="footer-line">&copy; <span id="year"></span></span>
+  <span class="footer-line">An open-source project by <a href="${GITHUB_URL}" target="_blank" rel="noopener">wazeerc</a></span>
 </footer>
 `
 
@@ -187,6 +191,7 @@ recalculate('perche', false)
 
 const bmiPanel = document.querySelector('#panel-bmi')
 bmiPanel.innerHTML = `
+  <h2 class="panel-title">Check your BMI (adults 18+)</h2>
   <p class="hint">Enter age, weight, and height. BMI updates automatically. Metric only.</p>
   <ul class="fields bmi-fields" id="bmi-fields"></ul>
   <p class="bmi-result" id="bmi-result"></p>
@@ -202,6 +207,7 @@ bmiPanel.innerHTML = `
       </thead>
       <tbody id="bmi-ref-body"></tbody>
     </table>
+    <p class="guide-outbound"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4890841/" target="_blank" rel="noopener">Learn more about BMI — National Library of Medicine</a></p>
   </section>
 `
 

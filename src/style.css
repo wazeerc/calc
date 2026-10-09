@@ -56,19 +56,42 @@ body {
   letter-spacing: 1px;
 }
 
+.header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  row-gap: 12px;
+  column-gap: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tagline {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
 .tabs {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 0;
 }
 
 .tab {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.2px;
   min-height: 44px;
-  padding: 8px 22px;
+  padding: 8px 14px;
   color: var(--paper);
   background: transparent;
   border: 2px solid var(--paper);
@@ -79,6 +102,7 @@ body {
 .tab:hover {
   background: var(--red);
   border-color: var(--red);
+  border-width: 1px;
   color: #ffffff;
 }
 
@@ -218,6 +242,14 @@ body {
   line-height: 1.5;
 }
 
+.panel-title {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  line-height: 1.4;
+}
+
 .fields {
   display: grid;
   grid-template-columns: 1fr;
@@ -281,6 +313,7 @@ body {
 }
 
 .guide {
+  margin-top: 8px;
   border: 2px solid var(--ink);
   background: var(--card);
 }
@@ -361,6 +394,26 @@ body {
   line-height: 1.5;
 }
 
+.guide-outbound {
+  margin: 0;
+  padding: 10px 14px;
+  border-top: 2px solid var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.guide-outbound a {
+  display: inline-block;
+  min-height: 44px;
+  line-height: 44px;
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--yellow);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -375,6 +428,11 @@ body {
 
 .app-footer {
   flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 12px;
   background: var(--ink);
   color: var(--paper);
   border-top: 2px solid var(--ink);
@@ -396,6 +454,11 @@ body {
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
   padding: 0 4px;
+}
+
+.footer-line {
+  display: inline;
+  text-align: left;
 }
 
 .app-footer a:hover {
