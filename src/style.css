@@ -394,26 +394,6 @@ body {
   line-height: 1.5;
 }
 
-.guide-outbound {
-  margin: 0;
-  padding: 10px 14px;
-  border-top: 2px solid var(--ink);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.guide-outbound a {
-  display: inline-block;
-  min-height: 44px;
-  line-height: 44px;
-  color: var(--ink);
-  font-weight: 700;
-  text-decoration: underline;
-  text-decoration-color: var(--yellow);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
-}
-
 .sr-only {
   position: absolute;
   width: 1px;

@@ -49,7 +49,7 @@ app.innerHTML = `
 </main>
 <footer class="app-footer">
   <span class="footer-line">&copy; <span id="year"></span></span>
-  <span class="footer-line">An open-source project by <a href="${GITHUB_URL}" target="_blank" rel="noopener">wazeerc</a></span>
+  <span class="footer-line">by <a href="${GITHUB_URL}" target="_blank" rel="noopener">wazeerc</a></span>
 </footer>
 `
 
@@ -199,14 +199,13 @@ bmiPanel.innerHTML = `
   <p class="bmi-refused" id="bmi-refused" hidden></p>
   <section class="guide" aria-label="BMI reference">
     <h2 class="guide-title">Reference</h2>
-    <p class="guide-intro">Body Mass Index (BMI) is a measure of body fat based on height and weight. The bands below are the adult (20+) scale.</p>
+    <p class="guide-intro">Body Mass Index (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4890841/" target="_blank" rel="noopener">BMI</a>) is a measure of body fat based on height and weight. The bands below are the adult (20+) scale.</p>
     <table class="guide-table">
       <thead>
         <tr><th scope="col">BMI</th><th scope="col">Category</th></tr>
       </thead>
       <tbody id="bmi-ref-body"></tbody>
     </table>
-    <p class="guide-outbound"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4890841/" target="_blank" rel="noopener">Learn more about BMI — National Library of Medicine</a></p>
   </section>
 `
 
