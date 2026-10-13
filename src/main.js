@@ -106,6 +106,60 @@ if (typeof window !== 'undefined' && window.addEventListener) {
 }
 selectTab(tabFromHash(), false, false)
 
+const mainEl = document.querySelector('.app-main')
+const SWIPE_MIN_DX = 64
+const SWIPE_MAX_DY = 80
+let swipeTouch = null
+
+function swipeStartInField(target) {
+  return target instanceof Element && target.closest('.field') !== null
+}
+
+if (mainEl) {
+  mainEl.addEventListener(
+    'touchstart',
+    (event) => {
+      if (event.touches.length !== 1) {
+        swipeTouch = null
+        return
+      }
+      const touch = event.touches[0]
+      swipeTouch = {
+        id: touch.identifier,
+        x: touch.clientX,
+        y: touch.clientY,
+        dead: swipeStartInField(event.target),
+      }
+    },
+    { passive: true },
+  )
+  mainEl.addEventListener(
+    'touchend',
+    (event) => {
+      if (!swipeTouch) return
+      const start = swipeTouch
+      swipeTouch = null
+      const touch = Array.from(event.changedTouches).find((t) => t.identifier === start.id)
+      if (!touch || start.dead) return
+      const dx = touch.clientX - start.x
+      const dy = touch.clientY - start.y
+      if (Math.abs(dx) < SWIPE_MIN_DX) return
+      if (Math.abs(dy) > SWIPE_MAX_DY) return
+      if (Math.abs(dy) > Math.abs(dx) / 2) return
+      if (dx < 0 && activeTab === 'land') selectTab('bmi', false, true)
+      else if (dx > 0 && activeTab === 'bmi') selectTab('land', false, true)
+      else return
+      const hiddenPanel = document.querySelector(activeTab === 'land' ? '#panel-bmi' : '#panel-land')
+      const focused = document.activeElement
+      if (hiddenPanel && focused && hiddenPanel.contains(focused)) focused.blur()
+    },
+    { passive: true },
+  )
+  mainEl.addEventListener('touchcancel', () => {
+    swipeTouch = null
+  })
+}
+
 const inputs = new Map()
 for (const unit of UNITS) {
   const item = document.createElement('li')
