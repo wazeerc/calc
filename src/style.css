@@ -234,7 +234,7 @@ body {
 .hint {
   margin: 0 0 14px;
   padding-left: 12px;
-  border-left: 8px solid var(--yellow);
+  border-left: 8px solid var(--red);
   font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
@@ -614,7 +614,7 @@ body {
   line-height: 44px;
   color: var(--paper);
   text-decoration: underline;
-  text-decoration-color: var(--yellow);
+  text-decoration-color: var(--red);
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
   padding: 0 4px;
