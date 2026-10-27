@@ -213,7 +213,7 @@ function findCatalogEntry(zone) {
   if (direct) return direct
   const canonical = canonicalZone(zone)
   if (!canonical) return null
-  return catalogByZone.get(canonical) || null
+  return ZONE_CATALOG.find((entry) => canonicalZone(entry.zone) === canonical) || null
 }
 
 function displayZone(zone) {
@@ -282,7 +282,10 @@ export function groupZoneFor(zone) {
   if (direct) return direct
   const canonical = canonicalZone(zone)
   if (!canonical) return zone
-  return groupByZone.get(canonical) || displayZone(zone) || zone
+  const group = ZONE_GROUPS.find((entry) =>
+    entry.zones.some((member) => canonicalZone(member) === canonical),
+  )
+  return group ? group.zone : displayZone(zone) || zone
 }
 
 export function formatOffset(minutes) {
