@@ -43,7 +43,7 @@ body {
   flex: 0 0 auto;
   background: var(--ink);
   color: var(--paper);
-  padding: 14px 20px;
+  padding: 12px 16px;
   border-bottom: 2px solid var(--ink);
 }
 
@@ -58,17 +58,14 @@ body {
 
 .header-row {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  row-gap: 12px;
-  column-gap: 16px;
+  min-width: 0;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -80,18 +77,21 @@ body {
 }
 
 .tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
-  margin-top: 0;
+  margin-top: 12px;
 }
 
 .tab {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 6px;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: 1.2px;
-  min-height: 44px;
-  padding: 8px 14px;
+  letter-spacing: 1px;
   color: var(--paper);
   background: transparent;
   border: 2px solid var(--paper);
@@ -102,8 +102,6 @@ body {
 .tab:hover {
   background: var(--red);
   border-color: var(--red);
-  border-width: 1px;
-  padding: 9px 15px;
   color: #ffffff;
 }
 
@@ -221,6 +219,7 @@ body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  contain: paint;
   padding: 16px 16px 28px;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -310,6 +309,191 @@ body {
 .field-input:focus {
   outline: none;
   box-shadow: 0 0 0 3px var(--yellow);
+}
+
+.tz-board {
+  display: grid;
+  grid-template-columns: 1fr;
+  border: 2px solid var(--ink);
+  background: var(--card);
+}
+
+.tz-card {
+  min-width: 0;
+  padding: 12px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.tz-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 20px;
+  margin-bottom: 12px;
+}
+
+.tz-card-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.tz-badge {
+  padding: 2px 6px;
+  color: var(--ink);
+  background: var(--yellow);
+  border: 2px solid var(--ink);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.tz-select {
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 8px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.tz-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--yellow);
+}
+
+.tz-clock {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: 44px;
+  margin-top: 12px;
+}
+
+.tz-clock[hidden] {
+  display: none;
+}
+
+.tz-time {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tz-date {
+  min-width: 0;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.tz-fixed {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 12px;
+  min-height: 44px;
+  margin-top: 12px;
+}
+
+.tz-fixed[hidden] {
+  display: none;
+}
+
+.tz-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 4px 6px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+}
+
+.tz-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--yellow);
+}
+
+.tz-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  background: var(--paper);
+}
+
+.tz-footer-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tz-summary {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.tz-note {
+  margin: 10px 0 0;
+  padding-left: 8px;
+  border-left: 6px solid var(--yellow);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.tz-note[hidden] {
+  display: none;
+}
+
+.tz-action {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 8px 10px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.tz-action:hover {
+  color: var(--ink);
+  background: var(--yellow);
+}
+
+.tz-action:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 2px;
 }
 
 .guide {
@@ -409,7 +593,7 @@ body {
 .app-footer {
   flex: 0 0 auto;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   column-gap: 12px;
@@ -453,8 +637,48 @@ body {
 }
 
 @media (min-width: 720px) {
+  .app-header {
+    padding: 14px 20px;
+  }
+
   .app-header h1 {
     font-size: 36px;
+  }
+
+  .tz-board {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .tz-card {
+    padding: 16px;
+    border-bottom: 0;
+  }
+
+  .tz-card:first-child {
+    border-right: 2px solid var(--ink);
+  }
+
+  .tz-card-head {
+    margin-bottom: 12px;
+  }
+
+  .tz-clock,
+  .tz-fixed {
+    margin-top: 14px;
+  }
+
+  .tz-footer {
+    grid-column: 1 / -1;
+    padding: 14px 16px;
+    border-top: 2px solid var(--ink);
+  }
+
+  .tz-summary {
+    font-size: 14px;
+  }
+
+  .tz-action {
+    padding: 8px 16px;
   }
 
   .fields {
@@ -487,22 +711,32 @@ body {
   }
 }
 
+@media (min-width: 900px) {
+  .tz-time {
+    font-size: 52px;
+  }
+
+  .tz-clock,
+  .tz-fixed {
+    min-height: 56px;
+  }
+
+  .tz-input {
+    min-height: 56px;
+  }
+}
+
 @media (max-width: 560px) {
+  .app-header {
+    padding: 10px 12px;
+  }
+
   .app-header h1 {
     font-size: 24px;
   }
 
-  .header-row {
-    flex-wrap: nowrap;
-    column-gap: 12px;
-  }
-
   .brand {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    min-width: 0;
-    flex-shrink: 1;
+    gap: 8px;
   }
 
   .tagline {
@@ -510,22 +744,24 @@ body {
   }
 
   .tabs {
-    flex-shrink: 0;
+    margin-top: 10px;
   }
 
   .tab {
     font-size: 11px;
-    padding: 8px 10px;
-  }
-
-  .tab:hover {
-    padding: 9px 11px;
   }
 
   .app-footer {
-    flex-wrap: nowrap;
     column-gap: 8px;
     font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+}
+
+@media (max-width: 380px) {
+  .tab {
+    padding: 8px 4px;
+    font-size: 10px;
     letter-spacing: 0.5px;
   }
 }
