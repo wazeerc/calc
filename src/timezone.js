@@ -141,6 +141,13 @@ const ZONE_CATALOG = ZONES.map(([zone, cities, primary]) => {
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const formatters = new Map()
 const canonicalCache = new Map()
+const cityCache = new Map()
+const catalogByZone = new Map(ZONE_CATALOG.map((entry) => [entry.zone, entry]))
+const groupByZone = new Map()
+
+for (const group of PICKER_GROUPS) {
+  for (const member of group.zones) groupByZone.set(member, group.zone)
+}
 
 function formatterFor(zone) {
   let formatter = formatters.get(zone)
@@ -179,10 +186,12 @@ export function getZonedParts(zone, instant) {
 }
 
 export function getOffsetMinutes(zone, instant) {
-  const ms = Number(instant)
-  const parts = getZonedParts(zone, ms)
+  return offsetFromParts(getZonedParts(zone, instant), instant)
+}
+
+function offsetFromParts(parts, instant) {
   const wall = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second)
-  return Math.round((wall - ms) / 60000)
+  return Math.round((wall - Number(instant)) / 60000)
 }
 
 export function canonicalZone(zone) {
@@ -199,9 +208,12 @@ export function canonicalZone(zone) {
 }
 
 function findCatalogEntry(zone) {
+  if (!zone || typeof zone !== 'string') return null
+  const direct = catalogByZone.get(zone)
+  if (direct) return direct
   const canonical = canonicalZone(zone)
   if (!canonical) return null
-  return ZONE_CATALOG.find((entry) => canonicalZone(entry.zone) === canonical) || null
+  return catalogByZone.get(canonical) || null
 }
 
 function displayZone(zone) {
@@ -215,10 +227,18 @@ export function isUtcZone(zone) {
 }
 
 export function cityForZone(zone) {
+  const key = String(zone || '')
+  if (cityCache.has(key)) return cityCache.get(key)
   const entry = findCatalogEntry(zone)
-  if (entry) return entry.city
-  const name = String(zone || '').split('/').pop()
-  return (name || String(zone || '')).replace(/_/g, ' ')
+  let city
+  if (entry) {
+    city = entry.city
+  } else {
+    const name = key.split('/').pop()
+    city = (name || key).replace(/_/g, ' ')
+  }
+  cityCache.set(key, city)
+  return city
 }
 
 export function detectZone() {
@@ -258,12 +278,11 @@ export function pickerGroups(detected = detectZone()) {
 
 // Map any IANA zone to the representative zone of its picker group.
 export function groupZoneFor(zone) {
+  const direct = groupByZone.get(zone)
+  if (direct) return direct
   const canonical = canonicalZone(zone)
   if (!canonical) return zone
-  const group = PICKER_GROUPS.find((entry) =>
-    entry.zones.some((member) => canonicalZone(member) === canonical),
-  )
-  return group ? group.zone : displayZone(zone) || zone
+  return groupByZone.get(canonical) || displayZone(zone) || zone
 }
 
 export function formatOffset(minutes) {
@@ -292,10 +311,6 @@ export function formatInputDate(parts) {
   )
 }
 
-export function formatInputTime(parts) {
-  return parts ? formatTime(parts) : ''
-}
-
 export function formatDate(parts, withYear = false) {
   if (!parts) return ''
   return parts.weekday + ' ' + parts.day + ' ' + MONTHS[parts.month - 1] + (withYear ? ' ' + parts.year : '')
@@ -310,10 +325,6 @@ export function sortZoneEntries(entries, instant) {
         (a.cities || a.city).localeCompare(b.cities || b.city) ||
         a.zone.localeCompare(b.zone),
     )
-}
-
-export function offsetSignature(entries, instant) {
-  return entries.map((entry) => entry.zone + ':' + getOffsetMinutes(entry.zone, instant)).join('|')
 }
 
 export function formatZoneOption(entry) {
@@ -372,7 +383,7 @@ export function resolveWallTime(zone, year, month, day, hour, minute) {
     return {
       instant: first.instant,
       parts: first.parts,
-      offset: getOffsetMinutes(zone, first.instant),
+      offset: offsetFromParts(first.parts, first.instant),
       adjusted: false,
       ambiguous: matches.length > 1,
     }
@@ -388,60 +399,10 @@ export function resolveWallTime(zone, year, month, day, hour, minute) {
   return {
     instant: chosen.instant,
     parts: chosen.parts,
-    offset: getOffsetMinutes(zone, chosen.instant),
+    offset: offsetFromParts(chosen.parts, chosen.instant),
     adjusted: true,
     ambiguous: false,
   }
-}
-
-function formatDuration(minutes) {
-  const hours = Math.floor(minutes / 60)
-  const rest = minutes % 60
-  const hourText = hours ? hours + ' hour' + (hours === 1 ? '' : 's') : ''
-  const minuteText = rest ? rest + ' minute' + (rest === 1 ? '' : 's') : ''
-  return [hourText, minuteText].filter(Boolean).join(' ')
-}
-
-export function offsetSummary(zoneA, zoneB, instant) {
-  const aOffset = getOffsetMinutes(zoneA, instant)
-  const bOffset = getOffsetMinutes(zoneB, instant)
-  const cityA = cityForZone(zoneA)
-  const cityB = cityForZone(zoneB)
-  const diff = bOffset - aOffset
-  if (canonicalZone(zoneA) === canonicalZone(zoneB)) {
-    return { minutes: diff, text: 'Both zones are on the same time.' }
-  }
-  if (diff === 0) {
-    return { minutes: 0, text: cityA + ' and ' + cityB + ' are on the same time.' }
-  }
-  return {
-    minutes: diff,
-    text:
-      cityA +
-      ' is ' +
-      formatDuration(Math.abs(diff)) +
-      (diff > 0 ? ' behind ' : ' ahead of ') +
-      cityB +
-      '.',
-  }
-}
-
-function fixedSummary(zoneA, zoneB, aParts, bParts) {
-  return (
-    'When it is ' +
-    formatTime(aParts) +
-    ' in ' +
-    cityForZone(zoneA) +
-    ' on ' +
-    formatDate(aParts, true) +
-    ', it will be ' +
-    formatTime(bParts) +
-    ' in ' +
-    cityForZone(zoneB) +
-    ' on ' +
-    formatDate(bParts, true) +
-    '.'
-  )
 }
 
 export function deriveBoard(state, now = Date.now()) {
@@ -451,6 +412,8 @@ export function deriveBoard(state, now = Date.now()) {
   if (state.mode !== 'fixed') {
     const aParts = getZonedParts(zoneA, instant)
     const bParts = getZonedParts(zoneB, instant)
+    const aOffset = offsetFromParts(aParts, instant)
+    const bOffset = offsetFromParts(bParts, instant)
     return {
       mode: 'live',
       valid: true,
@@ -458,12 +421,11 @@ export function deriveBoard(state, now = Date.now()) {
         zone: zoneA,
         instant,
         parts: aParts,
-        offset: getOffsetMinutes(zoneA, instant),
         adjusted: false,
         ambiguous: false,
       },
-      b: { zone: zoneB, instant, parts: bParts, offset: getOffsetMinutes(zoneB, instant) },
-      summary: offsetSummary(zoneA, zoneB, instant),
+      b: { zone: zoneB, instant, parts: bParts },
+      summary: { minutes: bOffset - aOffset },
     }
   }
   const wall = parseWallInput(state.sourceDate, state.sourceTime)
@@ -475,7 +437,6 @@ export function deriveBoard(state, now = Date.now()) {
         zone: zoneA,
         instant: null,
         parts: null,
-        offset: getOffsetMinutes(zoneA, instant),
         adjusted: false,
         ambiguous: false,
       },
@@ -485,7 +446,7 @@ export function deriveBoard(state, now = Date.now()) {
   }
   const resolved = resolveWallTime(zoneA, wall.year, wall.month, wall.day, wall.hour, wall.minute)
   const bParts = getZonedParts(zoneB, resolved.instant)
-  const bOffset = getOffsetMinutes(zoneB, resolved.instant)
+  const bOffset = offsetFromParts(bParts, resolved.instant)
   return {
     mode: 'fixed',
     valid: true,
@@ -501,11 +462,7 @@ export function deriveBoard(state, now = Date.now()) {
       zone: zoneB,
       instant: resolved.instant,
       parts: bParts,
-      offset: bOffset,
     },
-    summary: {
-      minutes: bOffset - resolved.offset,
-      text: fixedSummary(zoneA, zoneB, resolved.parts, bParts),
-    },
+    summary: { minutes: bOffset - resolved.offset },
   }
 }

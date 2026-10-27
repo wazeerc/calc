@@ -9,17 +9,15 @@ import {
   detectZone,
   formatDate,
   formatInputDate,
-  formatInputTime,
   formatOffset,
   formatTime,
   formatZoneOption,
   groupZoneFor,
-  offsetSignature,
   pickerGroups,
   sortZoneEntries,
 } from './timezone.js'
 
-const DEBOUNCE_MS = 200
+const DEBOUNCE_MS = 100
 const GITHUB_URL = 'https://github.com/wazeerc'
 
 const app = document.querySelector('#app')
@@ -268,7 +266,8 @@ function recalculate(sourceId, announce = true) {
   const { values } = convert(sourceId, raw)
   for (const [id, input] of inputs) {
     if (id === sourceId) continue
-    input.value = formatPlain(values[id])
+    const nextValue = formatPlain(values[id])
+    if (input.value !== nextValue) input.value = nextValue
   }
   if (!announce) {
     liveEl.textContent = ''
@@ -299,8 +298,10 @@ for (const [id, input] of inputs) {
       recalculate(id)
     }
     const parsed = parseInput(input.value)
-    if (!parsed.empty) input.value = formatPlain(parsed.value)
-    else if (input.value.trim() !== '') input.value = ''
+    if (!parsed.empty) {
+      const nextValue = formatPlain(parsed.value)
+      if (input.value !== nextValue) input.value = nextValue
+    } else if (input.value.trim() !== '') input.value = ''
   })
 }
 
@@ -489,19 +490,33 @@ let tzState = {
   sourceTime: '',
 }
 let tzBoard = null
+let tzPickerEntries = null
 let tzPickerSignature = ''
+let tzPickerMinute = -1
 let tzSyncInputs = false
 let tzTimer = null
+let tzRenderFrame = 0
 
 function announceTz(message) {
   liveEl.textContent = message
 }
 
+function setText(el, text) {
+  if (el.textContent !== text) el.textContent = text
+}
+
+function setHidden(el, hidden) {
+  if (el.hidden !== hidden) el.hidden = hidden
+}
+
 function rebuildPicker(now) {
-  const entries = pickerGroups(detectedZone)
-  const signature = offsetSignature(entries, now)
+  const minute = Math.floor(now / 60000)
+  if (minute === tzPickerMinute) return
+  tzPickerMinute = minute
+  if (!tzPickerEntries) tzPickerEntries = pickerGroups(detectedZone)
+  const sorted = sortZoneEntries(tzPickerEntries, now)
+  const signature = sorted.map((entry) => entry.zone + ':' + entry.offset).join('|')
   if (signature === tzPickerSignature) return
-  const sorted = sortZoneEntries(entries, now)
   const active = document.activeElement
   const focusA = active === tzZoneA
   const focusB = active === tzZoneB
@@ -514,8 +529,8 @@ function rebuildPicker(now) {
       select.appendChild(option)
     }
   }
-  tzZoneA.value = tzState.zoneA
-  tzZoneB.value = tzState.zoneB
+  if (tzZoneA.value !== tzState.zoneA) tzZoneA.value = tzState.zoneA
+  if (tzZoneB.value !== tzState.zoneB) tzZoneB.value = tzState.zoneB
   if (focusA) tzZoneA.focus()
   else if (focusB) tzZoneB.focus()
   tzPickerSignature = signature
@@ -523,18 +538,23 @@ function rebuildPicker(now) {
 
 function renderZone(timeEl, dateEl, zoneBoard, zone, withYear) {
   if (!zoneBoard || !zoneBoard.parts) {
-    timeEl.textContent = '--:--'
-    timeEl.removeAttribute('datetime')
-    timeEl.setAttribute('aria-label', 'No time to convert')
-    dateEl.textContent = ''
+    setText(timeEl, '--:--')
+    if (timeEl.hasAttribute('datetime')) timeEl.removeAttribute('datetime')
+    const emptyLabel = 'No time to convert'
+    if (timeEl.getAttribute('aria-label') !== emptyLabel) {
+      timeEl.setAttribute('aria-label', emptyLabel)
+    }
+    setText(dateEl, '')
     return
   }
   const parts = zoneBoard.parts
   const time = formatTime(parts)
-  timeEl.textContent = time
-  timeEl.setAttribute('datetime', formatInputDate(parts) + 'T' + time)
-  timeEl.setAttribute('aria-label', cityForZone(zone) + ', ' + time + ', ' + formatDate(parts, true))
-  dateEl.textContent = formatDate(parts, withYear)
+  setText(timeEl, time)
+  const stamp = formatInputDate(parts) + 'T' + time
+  if (timeEl.getAttribute('datetime') !== stamp) timeEl.setAttribute('datetime', stamp)
+  const label = cityForZone(zone) + ', ' + time + ', ' + formatDate(parts, true)
+  if (timeEl.getAttribute('aria-label') !== label) timeEl.setAttribute('aria-label', label)
+  setText(dateEl, formatDate(parts, withYear))
 }
 
 function sourceNote(a) {
@@ -589,36 +609,43 @@ function deriveUiBoard(state, now) {
 }
 
 function renderTimezone() {
+  if (tzRenderFrame) {
+    cancelAnimationFrame(tzRenderFrame)
+    tzRenderFrame = 0
+  }
   const now = Date.now()
   rebuildPicker(now)
   const board = deriveUiBoard(tzState, now)
   tzBoard = board
   const fixed = tzState.mode === 'fixed'
 
-  tzZoneA.value = tzState.zoneA
-  tzZoneB.value = tzState.zoneB
-  tzBClock.hidden = fixed
-  tzBFixed.hidden = !fixed
-  tzMode.textContent = fixed ? 'NOW' : 'SET TIME'
+  if (tzZoneA.value !== tzState.zoneA) tzZoneA.value = tzState.zoneA
+  if (tzZoneB.value !== tzState.zoneB) tzZoneB.value = tzState.zoneB
+  setHidden(tzBClock, fixed)
+  setHidden(tzBFixed, !fixed)
+  setText(tzMode, fixed ? 'NOW' : 'SET TIME')
 
   if (fixed && tzSyncInputs) {
-    tzDateB.value = tzState.sourceDate
-    tzTimeB.value = tzState.sourceTime
+    if (tzDateB.value !== tzState.sourceDate) tzDateB.value = tzState.sourceDate
+    if (tzTimeB.value !== tzState.sourceTime) tzTimeB.value = tzState.sourceTime
   }
   tzSyncInputs = false
 
   renderZone(tzATime, tzADate, board.a, tzState.zoneA, fixed)
   renderZone(tzBTime, tzBDate, board.b, tzState.zoneB, false)
 
-  tzSummary.textContent = board.valid
-    ? compactSummary(board.summary.minutes, tzState.zoneA, tzState.zoneB)
-    : 'Enter a valid date and time.'
+  setText(
+    tzSummary,
+    board.valid
+      ? compactSummary(board.summary.minutes, tzState.zoneA, tzState.zoneB)
+      : 'Enter a valid date and time.',
+  )
   const note = fixed && board.valid ? sourceNote(board.b) : ''
-  tzNote.textContent = note
-  tzNote.hidden = !note
+  setText(tzNote, note)
+  setHidden(tzNote, !note)
 
-  tzABadge.hidden = !detectedCanonical || canonicalZone(tzState.zoneA) !== detectedCanonical
-  tzBBadge.hidden = !detectedCanonical || canonicalZone(tzState.zoneB) !== detectedCanonical
+  setHidden(tzABadge, !detectedCanonical || canonicalZone(tzState.zoneA) !== detectedCanonical)
+  setHidden(tzBBadge, !detectedCanonical || canonicalZone(tzState.zoneB) !== detectedCanonical)
 }
 
 function setTime() {
@@ -629,9 +656,10 @@ function setTime() {
         : deriveBoard(tzState, Date.now()).b.parts
     tzState.mode = 'fixed'
     tzState.sourceDate = formatInputDate(frozen)
-    tzState.sourceTime = formatInputTime(frozen)
+    tzState.sourceTime = formatTime(frozen)
     tzSyncInputs = true
     renderTimezone()
+    stopTzTimer()
     announceTz(
       'Fixed time mode. THERE is ' +
         formatTime(frozen) +
@@ -646,16 +674,21 @@ function setTime() {
   tzState.mode = 'live'
   const board = deriveUiBoard(tzState, Date.now())
   tzState.sourceDate = formatInputDate(board.b.parts)
-  tzState.sourceTime = formatInputTime(board.b.parts)
+  tzState.sourceTime = formatTime(board.b.parts)
   tzSyncInputs = true
   renderTimezone()
+  startTzTimer()
   announceTz('Live mode.')
 }
 
 function updateSource() {
   tzState.sourceDate = tzDateB.value
   tzState.sourceTime = tzTimeB.value
-  renderTimezone()
+  if (tzRenderFrame) return
+  tzRenderFrame = requestAnimationFrame(() => {
+    tzRenderFrame = 0
+    renderTimezone()
+  })
 }
 
 function commitSource() {
@@ -664,7 +697,7 @@ function commitSource() {
   const board = deriveUiBoard(tzState, Date.now())
   if (board.valid && !board.b.adjusted && !board.b.ambiguous) {
     tzState.sourceDate = formatInputDate(board.b.parts)
-    tzState.sourceTime = formatInputTime(board.b.parts)
+    tzState.sourceTime = formatTime(board.b.parts)
     tzSyncInputs = true
   }
   renderTimezone()
@@ -716,9 +749,10 @@ function stopTzTimer() {
 
 function startTzTimer() {
   stopTzTimer()
+  if (tzState.mode !== 'live') return
   const tick = () => {
     if (activeTab !== 'timezone' || document.hidden) return
-    renderTimezone()
+    if (tzState.mode === 'live') renderTimezone()
     tzTimer = setTimeout(tick, 60000 - (Date.now() % 60000) + 20)
   }
   tzTimer = setTimeout(tick, 60000 - (Date.now() % 60000) + 20)
@@ -740,5 +774,4 @@ window.addEventListener('focus', () => {
   }
 })
 
-renderTimezone()
 selectTab(tabFromHash(), false, false)
