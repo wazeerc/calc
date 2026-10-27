@@ -1,6 +1,12 @@
 # Calc
 
-Just a helpful calculator — a land converter for Mauritius and an adult BMI calculator. No sign-up, nothing installed.
+Just a helpful calculator — a land converter for Mauritius and an adult BMI calculator.
+
+## Calculators
+
+- **LAND** — convert land measurements: perche, toise, arpent, hectares, and square meters/feet.
+- **BMI** — adult body mass index with the standard bands.
+- **TIMEZONE** — compare two zones live, or convert a fixed date and time.
 
 ## Develop
 
