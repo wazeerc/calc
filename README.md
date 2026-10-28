@@ -1,6 +1,6 @@
 # Calc
 
-Just a helpful calculator — a land converter for Mauritius and an adult BMI calculator. No sign-up, nothing installed.
+Just a helpful calculator — a land converter for Mauritius, an adult BMI calculator, and a two-zone timezone converter. No sign-up, nothing installed.
 
 ## Develop
 
