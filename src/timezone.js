@@ -154,6 +154,7 @@ function formatterFor(zone) {
   if (!formatter) {
     formatter = new Intl.DateTimeFormat('en-US', {
       timeZone: zone,
+      era: 'short',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -175,7 +176,7 @@ export function getZonedParts(zone, instant) {
     if (part.type !== 'literal') result[part.type] = part.value
   }
   return {
-    year: Number(result.year),
+    year: result.era === 'BC' ? 1 - Number(result.year) : Number(result.year),
     month: Number(result.month),
     day: Number(result.day),
     hour: Number(result.hour),
@@ -189,9 +190,22 @@ export function getOffsetMinutes(zone, instant) {
   return offsetFromParts(getZonedParts(zone, instant), instant)
 }
 
+function utcTimestamp(year, month, day, hour, minute, second = 0) {
+  const date = new Date(0)
+  date.setUTCFullYear(year, month - 1, day)
+  date.setUTCHours(hour, minute, second, 0)
+  return date.getTime()
+}
+
+function offsetMsFromParts(parts, instant) {
+  return (
+    utcTimestamp(parts.year, parts.month, parts.day, parts.hour, parts.minute, parts.second) -
+    Number(instant)
+  )
+}
+
 function offsetFromParts(parts, instant) {
-  const wall = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second)
-  return Math.round((wall - Number(instant)) / 60000)
+  return Math.round(offsetMsFromParts(parts, instant) / 60000)
 }
 
 export function canonicalZone(zone) {
@@ -356,19 +370,20 @@ export function parseWallInput(date, time) {
 }
 
 export function resolveWallTime(zone, year, month, day, hour, minute) {
-  const desired = Date.UTC(year, month - 1, day, hour, minute)
+  const desired = utcTimestamp(year, month, day, hour, minute)
   const offsets = []
   for (const delta of [0, -86400000, 86400000, -172800000, 172800000]) {
-    const offset = getOffsetMinutes(zone, desired + delta)
+    const sample = desired + delta
+    const offset = offsetMsFromParts(getZonedParts(zone, sample), sample)
     if (!offsets.includes(offset)) offsets.push(offset)
   }
   const candidates = []
   const matches = []
   for (const offset of offsets) {
-    const instant = desired - offset * 60000
+    const instant = desired - offset
     const parts = getZonedParts(zone, instant)
-    const wall = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute)
-    const candidate = { instant, parts, wall, offset }
+    const wall = utcTimestamp(parts.year, parts.month, parts.day, parts.hour, parts.minute)
+    const candidate = { instant, parts, wall }
     candidates.push(candidate)
     if (
       parts.year === year &&
